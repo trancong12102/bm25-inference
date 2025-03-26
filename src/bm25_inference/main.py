@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastembed import SparseTextEmbedding
 
-from bm25_inference import bm25
+from bm25_inference import bm25, health
 
 
 class AppState(TypedDict):
@@ -38,6 +38,7 @@ def create_app() -> FastAPI:
     )
 
     # routers
+    app.include_router(health.router)
     app.include_router(bm25.router)
 
     return app
