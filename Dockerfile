@@ -19,6 +19,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Then, use a final image without uv
 FROM python:3.13-slim-bookworm
+ENV TINI_VERSION=v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
 WORKDIR /app
 
 COPY ./scripts ./scripts
@@ -34,5 +38,5 @@ RUN python ./scripts/prefetch_models.py
 
 EXPOSE 8000
 # Run the FastAPI application by default
-SHELL [ "/bin/bash", "-c" ]
-CMD uvicorn --factory src.bm25_inference.main:create_app --host 0.0.0.0 --port 8000
+ENTRYPOINT ["/tini", "--"]
+CMD ["uvicorn", "--factory", "src.bm25_inference.main:create_app", "--host", "0.0.0.0", "--port", "8000"]
